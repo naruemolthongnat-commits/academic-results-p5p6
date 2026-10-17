@@ -12,6 +12,7 @@
             height: 100%;
             overflow: hidden;
             background-color: #fdfbff;
+            font-family: sans-serif;
         }
         iframe {
             width: 100%;
@@ -19,19 +20,71 @@
             border: none;
             display: block;
         }
+        .line-fallback {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 9999;
+            text-align: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+        .btn-open {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #06C755;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 16px;
+        }
     </style>
     <script>
-        // Check if the page is being opened inside LINE's in-app browser
-        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        if (userAgent.indexOf("Line") > -1) {
-            // Target Google Apps Script URL with openExternalBrowser parameter
+        (function() {
+            var ua = navigator.userAgent || navigator.vendor || window.opera || "";
+            var isLine = /line/i.test(ua);
+            var isAndroid = /android/i.test(ua);
+            
+            // ลิงก์ Apps Script สำหรับ iOS
             var gasUrl = "https://script.google.com/macros/s/AKfycbwHefWIDVNBKmCXO06a1DBs4fPl2kVwsfg89ARq8dYZ7fTMfXRYpGeMLJJcAqTznE5T/exec?openExternalBrowser=1";
-            // Redirect to force LINE to launch Chrome/Safari
-            window.location.href = gasUrl;
-        }
+
+            if (isLine) {
+                if (isAndroid) {
+                    // เปิดหน้า GitHub Pages นี้ใน Chrome โดยตรง เพื่อแก้ปัญหา Drive Error
+                    var currentGithubUrl = window.location.href.replace(/^https?:\/\//, '').split('?')[0];
+                    var intentUrl = "intent://" + currentGithubUrl + "#Intent;scheme=https;package=com.android.chrome;end";
+                    window.location.href = intentUrl;
+                } else {
+                    // สำหรับ iOS / iPhone
+                    window.location.replace(gasUrl);
+                }
+
+                // หากผ่านไป 1.5 วินาทีแล้วยังไม่เด้ง ให้เปิดหน้ากดปุ่มสำรอง
+                setTimeout(function() {
+                    document.getElementById('fallbackContainer').style.display = 'block';
+                }, 1500);
+            }
+        })();
     </script>
 </head>
 <body>
+
+    <!-- หน้าจอสำรองกรณี LINE บล็อกการเด้งอัตโนมัติ -->
+    <div id="fallbackContainer" class="line-fallback">
+        <h3>📣 ระบบแจ้งผลการเรียนออนไลน์</h3>
+        <p>กำลังนำท่านไปยังเบราว์เซอร์ภายนอกเพื่อการแสดงผลที่สมบูรณ์...</p>
+        <p>หากหน้าเว็บไม่เปิดอัตโนมัติ กรุณากดปุ่มด้านล่าง:</p>
+        <a id="directLink" href="https://script.google.com/macros/s/AKfycbwHefWIDVNBKmCXO06a1DBs4fPl2kVwsfg89ARq8dYZ7fTMfXRYpGeMLJJcAqTznE5T/exec?openExternalBrowser=1" class="btn-open" target="_blank">คลิกที่นี่เพื่อเปิดหน้าตรวจสอบเกรด</a>
+    </div>
+
+    <!-- โหลด Web App ปกติเมื่ออยู่ใน Chrome / Safari -->
     <iframe src="https://script.google.com/macros/s/AKfycbwHefWIDVNBKmCXO06a1DBs4fPl2kVwsfg89ARq8dYZ7fTMfXRYpGeMLJJcAqTznE5T/exec"></iframe>
+
 </body>
 </html>
