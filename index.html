@@ -20,6 +20,16 @@
             display: block;
         }
     </style>
+    <script>
+        // Check if the page is being opened inside LINE's in-app browser
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        if (userAgent.indexOf("Line") > -1) {
+            // Target Google Apps Script URL with openExternalBrowser parameter
+            var gasUrl = "https://script.google.com/macros/s/AKfycbwHefWIDVNBKmCXO06a1DBs4fPl2kVwsfg89ARq8dYZ7fTMfXRYpGeMLJJcAqTznE5T/exec?openExternalBrowser=1";
+            // Redirect to force LINE to launch Chrome/Safari
+            window.location.href = gasUrl;
+        }
+    </script>
 </head>
 <body>
     <iframe src="https://script.google.com/macros/s/AKfycbwHefWIDVNBKmCXO06a1DBs4fPl2kVwsfg89ARq8dYZ7fTMfXRYpGeMLJJcAqTznE5T/exec"></iframe>
